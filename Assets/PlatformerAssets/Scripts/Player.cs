@@ -2,15 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Extra Using statement to allow us to use the scene management functions
+using UnityEngine.SceneManagement;
+
 public class Player : MonoBehaviour
 {
 
     //designer variables
     public float speed = 10;
+    public float jumpSpeed = 10;
     public Rigidbody2D physicsBody;
     public string horizontalAxis = "Horizontal";
+    public string jumpButton = "Jump";
+
     public Animator PlayerAnimator;
     public SpriteRenderer PlayerSprite;
+    public Collider2D playerCollider;
 
     // Use this for initialization
     void Start()
@@ -51,8 +58,44 @@ public class Player : MonoBehaviour
         {
             PlayerSprite.flipX = false;
         }
-            
+
+        //Jumping
+
+        //Detect if we are touching the ground.
+        //Get the Layer Mask from Unity using the name of the layer.
+        LayerMask groundLayerMask = LayerMask.GetMask("Ground");
+        //Ask the player's collider if we are touching the LayerMask
+        bool touchingGround = playerCollider.IsTouchingLayers(groundLayerMask);
+        
+
+        bool jumpButtonPressed = Input.GetButtonDown(jumpButton);
+        if (jumpButtonPressed == true && touchingGround == true)
+        {
+            //We have pressed jump, so we should add set our
+            //upward velocity to our jump speed
+            velocity.y = jumpSpeed;
+
+            //Give the velocity to the rigidbody
+            physicsBody.velocity = velocity;
+
+
+        }
     
+    }
+
+    //Our own fuction for handling player death
+    public void Kill()
+    {
+        //Reset the current level to restart from the beginning.
+
+        //First, ask unity what the current level is
+        Scene currentLevel = SceneManager.GetActiveScene();
+
+        //Second, tell unity to load the current level again.
+        //By passing the build index of our level
+        SceneManager.LoadScene(currentLevel.buildIndex);
+
+
     }
 
 
